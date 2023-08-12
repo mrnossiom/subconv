@@ -1,0 +1,37 @@
+# Build
+target/
+certs/
+
+# Docker Local cache
+.caddy/
+.database/
+
+# Configuration
+.DS_Store
+.vscode/*
+!.vscode/settings.json
+.idea/
+
+# Localisation support
+!.vscode/i18n-ally-custom-framework.yml
+
+# Env
+.env*
+!.env.example
+
+# Terraform
+.terraform/
+.terraform.lock.*
+*.tfstate
+*.tfstate.*
+
+*.tfvars
+*.tfvars.json
+
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+.terraformrc
+terraform.rc
