@@ -1,13 +1,4 @@
-#![warn(
-	// clippy::missing_docs_in_private_items,
-	clippy::unwrap_used,
-	clippy::nursery,
-	clippy::pedantic,
-	// clippy::cargo,
-	clippy::print_literal,
-	rustdoc::broken_intra_doc_links
-)]
-#![allow(clippy::redundant_pub_crate)]
+//! Subtitle Tool, convert and shift SRTs
 
 use clap::Parser;
 use iconv::copy;
@@ -21,14 +12,14 @@ use uchardet::detect_encoding_name;
 
 #[derive(Debug, Parser)]
 #[command(author, version, about, long_about = None)]
+/// CLI command options
 struct Config {
+	/// Path to subtitle to convert
 	pub(crate) path: PathBuf,
 
 	#[clap(long, default_value = "UTF-8")]
+	/// Target encoding
 	pub(crate) to: String,
-
-	#[clap(long)]
-	pub(crate) repl: bool,
 }
 
 fn main() -> eyre::Result<()> {
@@ -96,6 +87,7 @@ fn main() -> eyre::Result<()> {
 }
 
 // TODO: extend to support other subtitle formats
+/// Checks wether the given has a correct subtitle extention
 fn is_subtitle(file: &Path) -> bool {
 	file.extension().map_or(false, |ext| ext == "srt")
 }
