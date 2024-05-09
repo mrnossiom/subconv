@@ -16,7 +16,6 @@ clap = { version = "4.3.21", features = ["derive"] }
 eyre = "0.6.8"
 iconv = "0.1.1"
 label-logger = { version = "0.2.0" }
-temp-file = "0.1.7"
 uchardet = "2.0.4"
 
 [lints]
