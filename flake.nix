@@ -55,6 +55,8 @@
             buildInputs = with pkgs; [
               stdenv.cc.cc
               cmake
+
+              libuchardet
             ];
 
             RUST_SRC_PATH = pkgs.rustPlatform.rustLibSrc;

@@ -1,18 +1,16 @@
-//! Subtitle Tool to manipulate SRTs
-//!
-//! # Features
-//! - Any processed SRT comes out UTF-8
-//! - You can shift the SRT timecodes with `--shift`
+#![doc = include_str!("../README.md")]
 
 use clap::Parser;
-use label_logger::{info, success, warn};
+use label_logger::{error, info, success};
 use std::{
 	fs,
 	path::{Path, PathBuf},
+	process,
 };
+use subconv::subrip;
 use uchardet::detect_encoding_name;
 
-/// CLI command options
+/// `subconv` cli options
 #[derive(Debug, Parser)]
 #[command(author, version, about, long_about = None)]
 struct Config {
@@ -29,19 +27,25 @@ struct Config {
 	#[clap(long, short)]
 	pub(crate) backup: bool,
 
-	/// Specifies by how much we should shift subtitles
+	// --- Parsing related
+	/// Enable transformations on subtitles by parsing them
 	#[clap(long, short)]
-	pub(crate) shift: Option<String>,
+	pub(crate) parse: bool,
+
+	/// Specifies by how much we should shift subtitles
+	#[clap(long, short, requires("parse"), value_parser = subrip::parse_shift)]
+	pub(crate) shift: Option<subrip::Shift>,
 }
 
 fn main() -> eyre::Result<()> {
 	let config = Config::parse();
 
-	if !is_subtitle(&config.input) {
-		warn!(
-			"`{}` is not a subtitle file",
-			config.input.to_string_lossy()
+	if subtitle_format(&config.input).is_none() {
+		error!(
+			"`{}` is not among supported subtitle formats",
+			config.input.display()
 		);
+		process::exit(1);
 	};
 
 	if config.backup {
@@ -50,21 +54,43 @@ fn main() -> eyre::Result<()> {
 
 	let mut content = convert_and_read(&config.input)?;
 
-	if let Some(shft) = config.shift {
-		shift(&mut content, shft)?;
+	if config.parse {
+		info!(label: "Parsing", "subtitles");
+		let mut subs = subrip::parse_subtitle_file(&content)?;
+
+		if let Some(shft) = config.shift {
+			info!(label: "Shifting", "subtitle by {shft}");
+			subrip::shift(&mut subs, &shft);
+		}
+
+		content = subs.to_string();
 	}
 
 	// TODO: maybe warn on inplace edition of subtitles
-	fs::write(config.output.unwrap_or(config.input), content)?;
-	success!("Converted subtitle file to `UTF-8`");
+	let path = config.output.unwrap_or(config.input);
+	fs::write(&path, content)?;
+	success!("converted/edited subtitle wrote to `{}`", path.display());
 
 	Ok(())
 }
 
+/// Supported formats
+enum SubFormat {
+	/// `SubRip` which has the `.srt` extension
+	///
+	/// Parsing is straight-forward
+	SubRip,
+}
+
 // TODO: extend to support other subtitle formats
-/// Checks wether the given has a correct subtitle extention
-fn is_subtitle(file: &Path) -> bool {
-	file.extension().map_or(false, |ext| ext == "srt")
+/// Checks whether the given has a correct subtitle extension
+fn subtitle_format(file: &Path) -> Option<SubFormat> {
+	match file.extension()?.to_string_lossy().as_ref() {
+		"srt" => Some(SubFormat::SubRip),
+		_ => None,
+	}
+
+	// file.extension().map_or(false, |ext| ext == "srt")
 }
 
 /// Copies the given file to an adjacent one with and added `.bak`
@@ -89,20 +115,15 @@ fn convert_and_read(input: &Path) -> eyre::Result<String> {
 
 	let content = match detect_encoding_name(&original_bytes) {
 		Ok(s) if s == "UTF-8" => {
-			info!("File is already `UTF-8`, skipping conversion");
+			info!(label: "Skipping", "conversion (file is already `UTF-8`)");
 			String::from_utf8(original_bytes)?
 		}
 		Ok(charset) => {
-			info!("Detected encoding: {}", charset);
+			info!(label: "Converting", "detected encoding `{}`", charset);
 			iconv::decode(&original_bytes, &charset)?
 		}
 		Err(err) => eyre::bail!("Could not detect encoding: {err}"),
 	};
 
 	Ok(content)
-}
-
-/// Parses the input subtitle and shifts with whats specified in `--shift`
-fn shift(content: &mut String, shift: String) -> eyre::Result<()> {
-	todo!()
 }
