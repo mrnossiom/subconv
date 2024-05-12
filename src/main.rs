@@ -1,6 +1,7 @@
 #![doc = include_str!("../README.md")]
 
 use clap::Parser;
+use eyre::Context;
 use label_logger::{error, info, success};
 use std::{
 	fs,
@@ -49,14 +50,16 @@ fn main() -> eyre::Result<()> {
 	};
 
 	if config.backup {
-		backup_file(&config.input)?;
+		backup_file(&config.input).wrap_err("Could not backup subtitle file")?;
 	}
 
-	let mut content = convert_and_read(&config.input)?;
+	let mut content = convert_and_read(&config.input)
+		.wrap_err("Could not read or decode source subtitle file")?;
 
 	if config.parse {
 		info!(label: "Parsing", "subtitles");
-		let mut subs = subrip::parse_subtitle_file(&content)?;
+		let mut subs =
+			subrip::parse_subtitle_file(&content).wrap_err("Could not parse subtitle file")?;
 
 		if let Some(shft) = config.shift {
 			info!(label: "Shifting", "subtitle by {shft}");
@@ -68,7 +71,7 @@ fn main() -> eyre::Result<()> {
 
 	// TODO: maybe warn on inplace edition of subtitles
 	let path = config.output.unwrap_or(config.input);
-	fs::write(&path, content)?;
+	fs::write(&path, content).wrap_err("Could not write to destination file")?;
 	success!("converted/edited subtitle wrote to `{}`", path.display());
 
 	Ok(())
@@ -89,8 +92,6 @@ fn subtitle_format(file: &Path) -> Option<SubFormat> {
 		"srt" => Some(SubFormat::SubRip),
 		_ => None,
 	}
-
-	// file.extension().map_or(false, |ext| ext == "srt")
 }
 
 /// Copies the given file to an adjacent one with and added `.bak`
@@ -111,7 +112,8 @@ fn backup_file(input: &Path) -> eyre::Result<()> {
 
 /// Detects the input file encoding and converts it to UTF-8
 fn convert_and_read(input: &Path) -> eyre::Result<String> {
-	let original_bytes = fs::read(input)?;
+	let original_bytes =
+		fs::read(input).wrap_err_with(|| eyre::eyre!("Could not read `{}`", input.display()))?;
 
 	let content = match detect_encoding_name(&original_bytes) {
 		Ok(s) if s == "UTF-8" => {

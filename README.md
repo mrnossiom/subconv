@@ -1,12 +1,12 @@
 # subconv
 
 <p align="center"><strong>
-Easily convert and transform subtitle files to your convenience
+Easily convert and transform subtitle files
 </strong></p>
 
 <p align="center">
   <a src="https://wakatime.com/badge/github/mrnossiom/subconv">
-    <img alt="Wakatime tracker time spent" src="https://wakatime.com/badge/github/mrnossiom/subconv.svg" />
+    <img alt="Time spent" src="https://wakatime.com/badge/github/mrnossiom/subconv.svg" />
   </a>
 </p>
 
