@@ -38,3 +38,7 @@ Only supported format right now is `SubRip` (`.srt`).
   subconv --input subtitle.srt --parse --shift +00:00:10,000
   ```
 
+---
+
+Work is licensed under [`CECILL-2.1`](https://choosealicense.com/licenses/cecill-2.1/), a French OSS license that allows modification and distribution of the software while requiring the same license for derived works.
+

@@ -1,15 +1,14 @@
 [package]
 name = "subconv"
-description = "Subtitle tool to convert and shift SRTs"
 version = "0.1.0"
 edition = "2021"
+
+description = "Subtitle tool to convert and shift SRTs"
+authors = ["Milo Moisson <milomoisson@gmail.com>"]
 repository = "https://github.com/mrnossiom/subconv"
-license = "MIT"
-readme = "./README.md"
 keywords = ["srt", "iconv", "shift"]
 categories = ["command-line-utilities"]
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+license = "CECILL-2.1"
 
 [dependencies]
 clap = { version = "4.3.21", features = ["derive"] }
@@ -29,7 +28,6 @@ nursery = { level = "warn", priority = -1 }
 
 missing_docs_in_private_items = "warn"
 print_literal = "warn"
-redundant_pub_crate = "allow"
 unwrap_used = "warn"
 [lints.rustdoc]
 broken_intra_doc_links = "warn"
