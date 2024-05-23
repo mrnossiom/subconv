@@ -5,7 +5,7 @@ Easily convert and transform subtitle files
 </strong></p>
 
 <p align="center">
-  <a src="https://wakatime.com/badge/github/mrnossiom/subconv">
+  <a href="https://wakatime.com/badge/github/mrnossiom/subconv">
     <img alt="Time spent" src="https://wakatime.com/badge/github/mrnossiom/subconv.svg" />
   </a>
 </p>
