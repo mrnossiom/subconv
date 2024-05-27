@@ -24,6 +24,18 @@ Only supported format right now is `SubRip` (`.srt`).
 
 - Backup the current file with the `--backup` flag in case you are not sure of the operation and don't want to lose the original subtitle.
 
+## Installation
+
+<details>
+  <summary>With <code>cargo</code></summary>
+
+Install from repository with `cargo`:
+
+```sh
+cargo install --git https://github.com/mrnossiom/subconv
+```
+</details>
+
 # Examples
 
 - Normalize a (`SubRip`) subtitle in-place to `UTF-8`
