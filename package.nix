@@ -1,4 +1,12 @@
-{ lib, rustPlatform, gitignore }:
+{ lib
+
+, gitignore
+, rustPlatform
+
+, cmake
+, libuchardet
+, stdenv
+}:
 
 let
   inherit (gitignore.lib) gitignoreSource;
@@ -14,12 +22,18 @@ rustPlatform.buildRustPackage {
 
   cargoLock = { lockFile = "${src}/Cargo.lock"; };
 
-  nativeBuildInputs = [ ];
-  buildInputs = [ ];
+  nativeBuildInputs = [
+    stdenv.cc.cc
+    cmake
+  ];
+
+  buildInputs = [
+    libuchardet
+  ];
 
   meta = {
     inherit (cargoTOML.package) description homepage license;
     maintainers = cargoTOML.package.authors;
-    mainProgram = "app";
+    mainProgram = "subconv";
   };
 }

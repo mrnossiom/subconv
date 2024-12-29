@@ -20,6 +20,10 @@ pub struct Shift {
 }
 
 /// Parse a user provided shift argument
+///
+/// # Errors
+///
+/// Fails if the input is not a valid [`Shift`]
 pub fn parse_shift(i: &str) -> eyre::Result<Shift> {
 	let (_, shift) = parse_shift_(i).map_err(|e| eyre::eyre!("{e}"))?;
 	Ok(shift)
@@ -57,20 +61,13 @@ pub struct Subtitles {
 	pile: Vec<Subtitle>,
 }
 
-impl ToString for Subtitles {
-	fn to_string(&self) -> String {
-		self.pile.iter().map(ToString::to_string).enumerate().fold(
-			String::new(),
-			|mut a, (i, b)| {
-				// Add subtitle block number
-				a.push_str(&(i + 1).to_string());
-				a.push('\n');
-				// Add subtitle content
-				a.push_str(&b);
-				a.push('\n');
-				a
-			},
-		)
+impl fmt::Display for Subtitles {
+	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+		for (num, block) in self.pile.iter().map(ToString::to_string).enumerate() {
+			// subtitle block content preceded with its 1-indexed number
+			write!(f, "{}\n{block}\n", num + 1)?;
+		}
+		Ok(())
 	}
 }
 
@@ -84,9 +81,9 @@ struct Subtitle {
 	content: String,
 }
 
-impl ToString for Subtitle {
-	fn to_string(&self) -> String {
-		format!("{} --> {}\n{}\n", self.start, self.end, self.content)
+impl fmt::Display for Subtitle {
+	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+		write!(f, "{} --> {}\n{}\n", self.start, self.end, self.content)
 	}
 }
 
@@ -160,6 +157,10 @@ impl fmt::Display for Timestamp {
 }
 
 /// Parse an entire subtitle file
+///
+/// # Errors
+///
+/// Fails if the input is not valid srt file content
 pub fn parse_subtitle_file(content: &str) -> eyre::Result<Subtitles> {
 	let (_, subs) = parse_subtitle_file_(content).map_err(|e| eyre::eyre!("{e}"))?;
 	Ok(subs)
@@ -190,6 +191,7 @@ pub fn shift(subtitles: &mut Subtitles, shift: &Shift) {
 #[cfg(test)]
 mod tests {
 	#[test]
+	#[ignore]
 	fn parse_single_subtitle_block() {
 		todo!()
 	}
