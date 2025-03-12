@@ -6,9 +6,6 @@ Easily convert and transform subtitle files
 
 <p align="center">
   <img alt="Nix Flake" src="https://img.shields.io/badge/Nix-Flake-blue?logo=nixos" />
-  <a href="https://wakatime.com/badge/github/mrnossiom/subconv">
-    <img alt="Time spent" src="https://wakatime.com/badge/github/mrnossiom/subconv.svg" />
-  </a>
 </p>
 
 Only supported format right now is `SubRip` (`.srt`).
@@ -82,4 +79,3 @@ Package is reachable through `packages.${system}.default` or `packages.${system}
 ---
 
 Work is licensed under [`CECILL-2.1`](https://choosealicense.com/licenses/cecill-2.1/), a French OSS license that allows modification and distribution of the software while requiring the same license for derived works.
-

@@ -1,10 +1,9 @@
 //! Handle `SubRip` files and shift the timestamps
 
 use nom::{
-	self,
+	Parser,
 	bytes::complete::{tag, take_until},
-	character::complete::one_of,
-	character::complete::{newline, u64 as u64p},
+	character::complete::{newline, one_of, u64 as u64p},
 	combinator::{eof, opt},
 	multi::many0,
 };
@@ -31,7 +30,7 @@ pub fn parse_shift(i: &str) -> eyre::Result<Shift> {
 
 /// Parse a user provided shift argument using nom
 fn parse_shift_(i: &str) -> nom::IResult<&str, Shift> {
-	let (i, sign) = opt(one_of("+-"))(i)?;
+	let (i, sign) = opt(one_of("+-")).parse(i)?;
 	let (i, offset) = parse_timestamp(i)?;
 	let (i, _) = eof(i)?;
 
@@ -174,7 +173,8 @@ fn parse_subtitle_file_(i: &str) -> nom::IResult<&str, Subtitles> {
 		let (i, sub) = parse_subtitle_block(i).map_err(|e| dbg!(e))?;
 
 		Ok((i, sub))
-	})(i)?;
+	})
+	.parse(i)?;
 	let (i, _) = eof(i)?;
 
 	Ok((i, Subtitles { pile: subtitles }))
