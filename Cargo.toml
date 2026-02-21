@@ -4,7 +4,6 @@ version = "0.0.0"
 edition = "2024"
 
 description = "Easily convert and transform subtitle files"
-authors = ["Milo Moisson <milo@wiro.world>"]
 repository = "https://github.com/mrnossiom/subconv"
 keywords = ["subtitle", "srt", "iconv", "shift"]
 categories = ["command-line-utilities"]
