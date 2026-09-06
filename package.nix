@@ -4,9 +4,8 @@
   gitignore,
   rustPlatform,
 
-  cmake,
   libuchardet,
-  stdenv,
+  pkg-config,
 }:
 
 let
@@ -24,8 +23,7 @@ rustPlatform.buildRustPackage {
   cargoLock.lockFile = "${src}/Cargo.lock";
 
   nativeBuildInputs = [
-    stdenv.cc.cc
-    cmake
+    pkg-config
   ];
 
   buildInputs = [
