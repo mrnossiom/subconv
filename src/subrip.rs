@@ -113,7 +113,7 @@ struct Timestamp(u64);
 
 impl Timestamp {
 	/// Shift a [`Timestamp`] by the amount parsed and stored in [`Shift`]
-	fn shift_by(&mut self, shift: &Shift) {
+	const fn shift_by(&mut self, shift: &Shift) {
 		if shift.negative {
 			self.0 -= shift.offset.0;
 		} else {
@@ -186,13 +186,4 @@ pub fn shift(subtitles: &mut Subtitles, shift: &Shift) {
 		s.start.shift_by(shift);
 		s.end.shift_by(shift);
 	});
-}
-
-#[cfg(test)]
-mod tests {
-	#[test]
-	#[ignore]
-	fn parse_single_subtitle_block() {
-		todo!()
-	}
 }

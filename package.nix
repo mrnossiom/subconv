@@ -1,9 +1,6 @@
 {
   lib,
   rustPlatform,
-
-  libuchardet,
-  pkg-config,
 }:
 
 let
@@ -17,14 +14,6 @@ rustPlatform.buildRustPackage {
   inherit src;
 
   cargoLock.lockFile = "${src}/Cargo.lock";
-
-  nativeBuildInputs = [
-    pkg-config
-  ];
-
-  buildInputs = [
-    libuchardet
-  ];
 
   meta = {
     inherit (cargo-toml.package) description homepage license;

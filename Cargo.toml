@@ -10,12 +10,12 @@ categories = ["command-line-utilities"]
 license = "CECILL-2.1"
 
 [dependencies]
+chardetng = "1.0.0"
 clap = { version = "4", features = ["derive"] }
+encoding_rs = "0.8.44"
 eyre = "0.6"
-iconv = "0.1"
-label-logger = "0.3" 
+label-logger = "0.3"
 nom = "8"
-uchardet = "2"
 
 [lints]
 [lints.rust]

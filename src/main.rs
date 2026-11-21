@@ -9,7 +9,6 @@ use std::{
 	process,
 };
 use subconv::subrip;
-use uchardet::detect_encoding_name;
 
 /// `subconv` cli options
 #[derive(Debug, Parser)]
@@ -47,7 +46,7 @@ fn main() -> eyre::Result<()> {
 			config.input.display()
 		);
 		process::exit(1);
-	};
+	}
 
 	if config.backup {
 		backup_file(&config.input).wrap_err("Could not backup subtitle file")?;
@@ -61,9 +60,9 @@ fn main() -> eyre::Result<()> {
 		let mut subs =
 			subrip::parse_subtitle_file(&content).wrap_err("Could not parse subtitle file")?;
 
-		if let Some(shft) = config.shift {
-			info!(label: "Shifting", "subtitle by {shft}");
-			subrip::shift(&mut subs, &shft);
+		if let Some(shift) = config.shift {
+			info!(label: "Shifting", "subtitle by {shift}");
+			subrip::shift(&mut subs, &shift);
 		}
 
 		content = subs.to_string();
@@ -103,7 +102,7 @@ fn backup_file(input: &Path) -> eyre::Result<()> {
 
 	if backup_file.exists() {
 		eyre::bail!("Backup file already exists");
-	};
+	}
 
 	fs::copy(input, &backup_file)?;
 
@@ -115,17 +114,21 @@ fn convert_and_read(input: &Path) -> eyre::Result<String> {
 	let original_bytes =
 		fs::read(input).wrap_err_with(|| eyre::eyre!("Could not read `{}`", input.display()))?;
 
-	let content = match detect_encoding_name(&original_bytes) {
-		Ok(s) if s == "UTF-8" => {
-			info!(label: "Skipping", "conversion (file is already `UTF-8`)");
-			String::from_utf8(original_bytes)?
-		}
-		Ok(charset) => {
-			info!(label: "Converting", "detected encoding `{}`", charset);
-			iconv::decode(&original_bytes, &charset)?
-		}
-		Err(err) => eyre::bail!("Could not detect encoding: {err}"),
-	};
+	let mut detector = chardetng::EncodingDetector::new(chardetng::Iso2022JpDetection::Deny);
+	detector.feed(&original_bytes, true);
 
-	Ok(content)
+	let (content, encoding, had_errors) = detector
+		.guess(None, chardetng::Utf8Detection::Allow)
+		.decode(&original_bytes);
+	if had_errors {
+		error!("We could not decode a part of the file, check for encoding mistakes!");
+	}
+
+	if encoding == encoding_rs::UTF_8 {
+		info!(label: "Skipping", "conversion (file is already `UTF-8`)");
+	} else {
+		info!(label: "Converting", "detected encoding `{}`", encoding.name());
+	}
+
+	Ok(content.to_string())
 }
